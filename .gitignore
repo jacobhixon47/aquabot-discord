@@ -1,0 +1,7 @@
+# Standard
+.DS_Store
+node_modules
+
+# auth and pckg
+auth.json
+package-lock.json
