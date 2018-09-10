@@ -8,6 +8,8 @@
 
 - [Nodemon](https://www.npmjs.com/package/nodemon) - For auto-reloading the local development server.
 
+### Installation
+
 * Clone repository
 
 * run `$npm i`
