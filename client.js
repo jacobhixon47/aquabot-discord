@@ -7,6 +7,7 @@ const prefix = botSettings.prefix;
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
+client.tempMutedUsers = require('./temp-muted-users.json');
 
 // read directory of commands
 fs.readdir('./commands/', (err, files) => {
@@ -30,6 +31,24 @@ fs.readdir('./commands/', (err, files) => {
 client.on('ready', async () => {
   console.log('AquaBot is ready!');
   console.log(client.commands);
+  console.log(`muted role: ${botSettings.mutedRole}`);
+  client.setInterval(() => {
+    for(let i in client.tempMutedUsers) {
+      let time = client.tempMutedUsers[i].time;
+      let guildId = client.tempMutedUsers[i].guild;
+      let guild = client.guilds.get(guildId);
+      let member = guild.members.get(i);
+      let mutedRole = guild.roles.find(r => r.name === 'Aqua Muted');
+      if(!mutedRole) continue;
+      if(Date.now() > time) {
+        member.removeRole(mutedRole);
+        delete client.tempMutedUsers[i];
+        fs.writeFile('./temp-muted-users.json', JSON.stringify(client.tempMutedUsers), err => {
+          if (err) throw err;
+        });
+      }
+    }
+  }, 30000);
 
 // create and log invite link
   try {

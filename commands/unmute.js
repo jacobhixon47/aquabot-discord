@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 module.exports.run = async (client, message, args) => {
   if (!message.member.hasPermission("MANAGE_MESSAGES")) return message.reply(" you do not have this permission.");
   // get user or if none, end func
@@ -15,6 +17,15 @@ module.exports.run = async (client, message, args) => {
   if (!role || !muteTarget.roles.has(role.id)) return message.channel.send("This user is not muted!");
 
   await muteTarget.removeRole(role).catch(err => {console.log(err.stack); });
+  // check for user in temp-mute list
+  if (client.tempMutedUsers[muteTarget.id]) {
+    // remove muted user from tempMutedUsers
+    delete client.tempMutedUsers[muteTarget.id];
+    //re-write 'temp-muted-users.json' with updated list
+    fs.writeFile('./temp-muted-users.json', JSON.stringify(client.tempMutedUsers), err => {
+      if (err) throw err;
+    });
+  }
   message.reply(`${muteTarget.user.username} has been unmuted! o7`);
 }
 
